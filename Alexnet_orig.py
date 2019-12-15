@@ -108,6 +108,7 @@ class MyModel(Model):
 model = MyModel()
 
 im = Image.open("images/poodle.png")
+im = tf.cast(im, tf.float32)
 # im = Image.open("fish.jpg")
 # im = Image.open("dog.png")
 im = im.resize([224, 224])
