@@ -5,6 +5,7 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image
 from classes import classes
+from Networks.Alexnet import Alexnet
 
 from utils import get_object, Plotter, AlexNetWeightsLoader, preprocess_image
 from train_test import Trainer, Validator
@@ -52,12 +53,11 @@ def get_network(network_type):
 
 
 def main_by_args(args):
-    tf.keras.backend.set_floatx('float64')
+    tf.keras.backend.set_floatx('float32')
 
     weights_loader = AlexNetWeightsLoader()
 
     model = get_network(args.nntype)
-
     im = Image.open("images/poodle.png")
     I = preprocess_image(im)
 
