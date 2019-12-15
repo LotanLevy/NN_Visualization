@@ -143,5 +143,7 @@ model.dense3.set_weights((np.load(wdir + 'dense3.npy'), np.load(wdir + 'dense3b.
 
 c = model(I)
 
+print(c)
+
 top_ind = np.argmax(c)
 print("Top1: %d, %s" % (top_ind, classes[top_ind]))
