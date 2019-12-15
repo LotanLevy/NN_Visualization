@@ -126,7 +126,7 @@ print(I.dtype)
 
 model(I)  # Init graph
 
-wdir = "/content/drive/My Drive/Colab Notebooks/weights"
+wdir = "/content/drive/My Drive/Colab Notebooks/weights/"
 
 model.conv1.set_weights((np.load(wdir + 'conv1.npy'), np.load(wdir + 'conv1b.npy')))
 model.conv2a.set_weights((np.load(wdir + 'conv2_a.npy'), np.load(wdir + 'conv2b_a.npy')))
