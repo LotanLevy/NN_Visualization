@@ -120,7 +120,9 @@ I = np.flip(I, 2)  # BGR
 I = I - [[[104.00698793, 116.66876762, 122.67891434]]]  # subtract mean - whitening
 # I = I - np.mean(I,axis=(0,1),keepdims=True)
 
-I = np.reshape(I, (1,) + I.shape)
+I = np.reshape(I, (1,) + I.shape).astype(np.float32)
+
+print(I.dtype)
 
 model(I)  # Init graph
 
