@@ -143,8 +143,6 @@ model.dense3.set_weights((np.load(wdir + 'dense3.npy'), np.load(wdir + 'dense3b.
 
 c = model(I)
 
-print(c)
-
 c = tf.cast(c, tf.float32).numpy()
 
 top_ind = np.argmax(c)
