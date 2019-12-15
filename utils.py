@@ -65,14 +65,14 @@ class Plotter:
 # ~~~~   File Managing   ~~~~#
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
-def get_module_classes(module, classes):
-    for name, obj in inspect.getmembers(module):
+def get_module_classes(module, classes, max_depth=2):
+    if max_depth > 0:
+        for name, obj in inspect.getmembers(module):
+            if inspect.ismodule(obj):
+                classes.union(classes, get_module_classes(obj, classes, max_depth-1))
 
-        if inspect.ismodule(obj):
-            classes.union(classes, get_module_classes(obj, classes))
-
-        if inspect.isclass(obj) and issubclass(obj, NN):
-            classes.add(obj)
+            if inspect.isclass(obj) and issubclass(obj, NN):
+                classes.add(obj)
     return classes
 
 

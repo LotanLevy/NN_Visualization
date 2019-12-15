@@ -58,7 +58,7 @@ def main_by_args(args):
 
     model = get_network(args.nntype)
 
-    im = Image.open("poodle.png")
+    im = Image.open("images/poodle.png")
     I = preprocess_image(im)
 
     model(I)  # Init graph
