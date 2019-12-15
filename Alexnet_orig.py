@@ -107,7 +107,7 @@ class MyModel(Model):
 # Create an instance of the model
 model = MyModel()
 
-im = Image.open("poodle.png")
+im = Image.open("images/poodle.png")
 # im = Image.open("fish.jpg")
 # im = Image.open("dog.png")
 im = im.resize([224, 224])
