@@ -105,6 +105,8 @@ class MyModel(Model):
 
 
 # Create an instance of the model
+tf.keras.backend.set_floatx('float32')
+
 model = MyModel()
 
 im = Image.open("images/poodle.png")
