@@ -6,10 +6,28 @@ from tensorflow.python.keras.losses import Loss, SparseCategoricalCrossentropy, 
 from tensorflow.python.keras.backend import argmax
 import tensorflow as tf
 import numpy as np
+from PIL import Image
 import sys
 
 
 import zipfile
+
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+# ~~~~~~     Weights Loader     ~~~~~#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+class ImageLoss(Loss):
+
+    def __init__(self):
+        super(ImageLoss, self).__init__()
+
+
+
+    def call(self, y_true, y_pred):
+        l1 = self.cross_entrophy_loss(y_true[:, 0], y_pred[:, 0, :])
+        l2 = self.cross_entrophy_loss(y_true[:, 1], y_pred[:, 1, :])
+        return l1 + l2
 
 
 
@@ -104,8 +122,22 @@ def preprocess_image(im):
     I = np.reshape(I, (1,) + I.shape).astype(np.float32)
     return I
 
+def create_random_image(size=(224, 224, 3)):
+    return Image.fromarray(np.uint8(np.random.normal(size=size)*255))
 
-def extract_zip(path_to_zip_file, directory_to_extract_to):
-    with zipfile.ZipFile(path_to_zip_file, 'r') as zip_ref:
-        zip_ref.extractall(directory_to_extract_to)
+
+def clip_0_1(image):
+    return tf.clip_by_value(image, clip_value_min=0.0, clip_value_max=1.0)
+
+
+def tensor_to_image(tensor):
+    tensor = tensor*255
+    tensor = np.array(tensor, dtype=np.uint8)
+    if np.ndim(tensor)>3:
+        assert tensor.shape[0] == 1
+        tensor = tensor[0]
+    return Image.fromarray(tensor)
+
+def tensor_to_numpy(tensor):
+    return np.array(tensor)
 

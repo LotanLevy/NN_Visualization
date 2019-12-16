@@ -5,10 +5,10 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image
 from classes import classes
-from Networks.Alexnet import Alexnet
 
-from utils import get_object, Plotter, AlexNetWeightsLoader, preprocess_image
-from train_test import Trainer, Validator
+from utils import *
+from train_test import ImageTrainer
+
 
 
 """
@@ -34,8 +34,22 @@ def get_args():
     """
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('--nntype', default="Alexnet", help='The type of the network')
+    parser.add_argument('--optimizer', '-opt', default="adam", help='optimizer  type')
+
     # parser.add_argument('--dstype', default="num", help='The type of the dataset')
     parser.add_argument('--ckpt_path', default="weights", help='The type of the network')
+    parser.add_argument('--image_path', default="", help='The path to keep the learned image')
+    parser.add_argument('--reg_factor', type=float, default=0.2, help='The regression (lambda) value')
+    parser.add_argument('--min_target_activation', type=float, default=400, help='The min value for the neuron activation')
+    parser.add_argument('--max_iter', type=float, default=5000, help='The maximum iterations')
+    parser.add_argument('--neuron_layer_idx', "-nl", type=int, default=21, help='The index of the require neuron')
+    parser.add_argument('-ni', '--neuron_idx_list', type=int, default=[0], action='append', help='The indices of the neuron (-ni=1, -ni=2 -ni=3)')
+
+
+
+
+
+
     return parser.parse_args()
 
 
@@ -49,20 +63,56 @@ def get_network(network_type):
     package = Networks
     return get_object(network_type, package)
 
+def get_optimizer(optimizer_type):
+    """
+    :param optimizer_type: The require optimizer type
+    :return: optimizer object
+    """
+    if optimizer_type == "adam":
+        return tf.keras.optimizers.Adam()
+    return None
+
+
+
+
+def train_main(max_iterations, image_trainer, trained_image):
+    trained_image = tf.Variable(trained_image)
+    train_step = image_trainer.get_step()
+    iter_counter = 0
+    for i in range(max_iterations):
+        iter_counter += 1
+        train_step(trained_image)
+        if image_trainer.end_training:
+            print("trainer achieved the maximum value")
+            break
+        if i%1000:
+            print(i)
+    print("Training is stop after {} iterations".format(iter_counter))
+    return clip_0_1(trained_image)
 
 
 
 def main_by_args(args):
     tf.keras.backend.set_floatx('float32')
-
     weights_loader = AlexNetWeightsLoader()
-
     model = get_network(args.nntype)
-    im = Image.open("images/poodle.png")
+    optimizer = get_optimizer(args.optimizer)
+
+    im = create_random_image()
+    im.show()
     I = preprocess_image(im)
 
     model(I)  # Init graph
     weights_loader.load(model, args.ckpt_path + "/")
+    model.set_specified_neuron_values(args.neuron_layer_idx, args.neuron_idx_list)
+    trainer = ImageTrainer(model, optimizer, args.min_target_activation, args.reg_factor)
+
+    learned_image = train_main(args.max_iter, trainer, I)
+
+    learned_image = tensor_to_image(learned_image)
+
+    learned_image.show()
+
 
     c = model(I)
 

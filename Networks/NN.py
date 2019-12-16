@@ -11,6 +11,9 @@ class NN(Model):
     def __init__(self):
         super(NN, self).__init__()
 
+    def set_specified_neuron_values(self, index, neuron_indices): # index from 0
+        pass
+
 
 
 

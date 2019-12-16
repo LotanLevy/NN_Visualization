@@ -27,40 +27,43 @@ class Alexnet(NN):
         self.conv5b = Conv2D(filters=128, kernel_size=(3, 3), strides=(1, 1), padding='same')
 
         # Fully-connected layers
-
         self.flatten = Flatten()
-
         self.dense1 = Dense(4096, input_shape=(100,))
         self.dense2 = Dense(4096)
         self.dense3 = Dense(1000)
 
-        # Network definition
+        self.norm1 = lambda x: tf.nn.local_response_normalization(x, depth_radius=2, alpha=2e-05, beta=0.75, bias=1.0)
+        self.concat2 = lambda x: tf.concat((self.conv2a(x[:, :, :, :48]), self.conv2b(x[:, :, :, 48:])), 3)
+        self.concat4 = lambda x: tf.concat((self.conv4a(x[:, :, :, :192]), self.conv4b(x[:, :, :, 192:])), 3)
+        self.concat5 = lambda x: tf.concat((self.conv5a(x[:, :, :, :192]), self.conv5b(x[:, :, :, 192:])), 3)
+
+
+
+        self.all_layers = [self.conv1, self.relu, self.norm1, self.maxpool, self.concat2, self.relu, self.norm1, self.maxpool,
+                           self.conv3, self.relu, self.concat4, self.relu, self.concat5, self.relu, self.maxpool,
+                           self.flatten, self.dense1, self.relu, self.dense2, self.relu, self.dense3, self.softmax]
+
+        self.max_layer_index = len(self.all_layers) - 1
+        self.neuron_indices = []
+
+    def set_specified_neuron_values(self, index, neuron_indices): # index from 0
+        self.max_layer_index = index
+        self.neuron_indices = neuron_indices
+
+    def get_neuron_values(self, result):
+        if len(self.neuron_indices) > 0:
+            result = result[0]
+            for idx in self.neuron_indices:
+                result = result[idx]
+        return result
 
     def call(self, x):
-        x = self.conv1(x)
-        x = self.relu(x)
-        x = tf.nn.local_response_normalization(x, depth_radius=2, alpha=2e-05, beta=0.75, bias=1.0)
-        x = self.maxpool(x)
+        for i in range(self.max_layer_index + 1):
+            x = self.all_layers[i](x)
 
-        x = tf.concat((self.conv2a(x[:, :, :, :48]), self.conv2b(x[:, :, :, 48:])), 3)
-        x = self.relu(x)
-        x = tf.nn.local_response_normalization(x, depth_radius=2, alpha=2e-05, beta=0.75, bias=1.0)
-        x = self.maxpool(x)
+        return self.get_neuron_values(x)
 
-        x = self.conv3(x)
-        x = self.relu(x)
-        x = tf.concat((self.conv4a(x[:, :, :, :192]), self.conv4b(x[:, :, :, 192:])), 3)
-        x = self.relu(x)
-        x = tf.concat((self.conv5a(x[:, :, :, :192]), self.conv5b(x[:, :, :, 192:])), 3)
-        x = self.relu(x)
-        x = self.maxpool(x)
 
-        x = self.flatten(x)
 
-        x = self.dense1(x)
-        x = self.relu(x)
-        x = self.dense2(x)
-        x = self.relu(x)
-        x = self.dense3(x)
 
-        return self.softmax(x)
+
