@@ -8,7 +8,7 @@ class ImageTrainer:
     """
     Manage the train step
     """
-    def __init__(self, target_neuron, optimizer, image, min_value_target, regression_factor=0.2):
+    def __init__(self, target_neuron, optimizer, loss_name, min_value_target, regression_factor=0.2):
         self.target_neuron = target_neuron
         self.optimizer = optimizer
         self.min_value_target = tf.constant(min_value_target, dtype=tf.float32)
@@ -16,6 +16,7 @@ class ImageTrainer:
         self.end_training = False
         self.train_loss = tf.keras.metrics.Mean(name='train_loss')
         self.last_pred = tf.keras.metrics.Mean(name='last_pred')
+        self.loss_name = loss_name
 
 
 
@@ -26,7 +27,7 @@ class ImageTrainer:
         def train_step(image):
             with tf.GradientTape() as tape:
                 prediction = self.target_neuron(image)
-                loss = self.calculate_loss(prediction, image)
+                loss = self.calculate_loss(prediction, tf.identity(image))
 
             gradients = tape.gradient(loss, image)
             self.optimizer.apply_gradients([(gradients, image)])
@@ -35,11 +36,15 @@ class ImageTrainer:
         return train_step
 
     def calculate_loss(self, prediction, image):
-        square_norm = tf.reduce_mean(tf.square(tf.sqrt(tf.square(image))))
-        loss = -(prediction - self.regression_factor * square_norm)
+        if self.loss_name == "Fourier":
+            fft_image = tf.signal.fft(tf.cast(image, tf.complex64))
+            w = tf.cast(tf.linalg.norm(fft_image), tf.float32)
+            reg = tf.cast(tf.reduce_mean(tf.abs(fft_image) - 1/w), tf.float32)
+        else:
+            reg = self.regression_factor * tf.reduce_mean(tf.square(tf.sqrt(tf.square(image))))
+        loss = -(prediction - reg)
         self.last_pred.reset_states()
         self.last_pred(prediction)
-
         return loss
 
 

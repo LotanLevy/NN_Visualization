@@ -41,7 +41,9 @@ def get_args():
     # parser.add_argument('--dstype', default="num", help='The type of the dataset')
     parser.add_argument('--ckpt_path', default="weights", help='The type of the network')
     parser.add_argument('--image_path', default="", help='The path to keep the learned image')
-    parser.add_argument('--reg_factor', type=float, default=0.00002, help='The regression (lambda) value')
+    parser.add_argument('--reg_factor', type=float, default=0.2, help='The regression (lambda) value')
+    parser.add_argument('--reg_type', default="basic", help='The regression type (Fourier/basic)')
+
     parser.add_argument('--min_target_activation', type=float, default=400, help='The min value for the neuron activation')
     parser.add_argument('--max_iter', type=int, default=100, help='The maximum iterations')
     parser.add_argument('--neuron_layer_idx', "-nl", type=int, default=21, help='The index of the require neuron')
@@ -82,16 +84,20 @@ def train_main(max_iterations, image_trainer, trained_image):
     train_step = image_trainer.get_step()
     i = 0
     try:
+
         for _ in range(max_iterations):
             i += 1
             train_step(trained_image)
             if image_trainer.last_pred.result().numpy() > 0.8:
                 print("trainer achieved the maximum value")
                 break
-            if i%500 == 0:
+            if i%10 == 0:
                 print("loss after {} iterations: {}, prediction {}".format(i + 1,
                                       image_trainer.train_loss.result(), image_trainer.last_pred.result()))
         print("Training is stop after {} iterations".format(i))
+        return trained_image
+    except Exception as e:
+        raise e
     finally:
         return trained_image
 
@@ -115,7 +121,7 @@ def main_by_args(args):
     model(I)  # Init graph
     weights_loader.load(model, args.ckpt_path + "/")
     model.set_specified_neuron_values(args.neuron_layer_idx, args.neuron_idx_list)
-    trainer = ImageTrainer(model, optimizer, args.min_target_activation, args.reg_factor)
+    trainer = ImageTrainer(model, optimizer, args.reg_type, args.min_target_activation, args.reg_factor)
 
     learned_image = train_main(args.max_iter, trainer, I)
 
