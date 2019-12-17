@@ -81,7 +81,7 @@ def train_main(max_iterations, image_trainer, trained_image):
     trained_image = tf.Variable(trained_image)
     train_step = image_trainer.get_step()
     i = 0
-    while True:
+    for _ in range(max_iterations):
         i += 1
         train_step(trained_image)
         if image_trainer.train_loss.result().numpy() <= 10:
