@@ -8,10 +8,9 @@ class ImageTrainer:
     """
     Manage the train step
     """
-    def __init__(self, target_neuron, optimizer, loss_name, min_value_target, regression_factor=0.2):
+    def __init__(self, target_neuron, optimizer, loss_name, regression_factor):
         self.target_neuron = target_neuron
         self.optimizer = optimizer
-        self.min_value_target = tf.constant(min_value_target, dtype=tf.float32)
         self.regression_factor = np.float32(regression_factor)
         self.end_training = False
         self.train_loss = tf.keras.metrics.Mean(name='train_loss')

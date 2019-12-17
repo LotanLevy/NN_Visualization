@@ -38,22 +38,16 @@ def get_args():
     parser.add_argument('--nntype', default="Alexnet", help='The type of the network')
     parser.add_argument('--optimizer', '-opt', default="adam", help='optimizer  type')
 
-    # parser.add_argument('--dstype', default="num", help='The type of the dataset')
     parser.add_argument('--ckpt_path', default="weights", help='The type of the network')
     parser.add_argument('--image_path', default="", help='The path to keep the learned image')
-    parser.add_argument('--reg_factor', type=float, default=0.2, help='The regression (lambda) value')
-    parser.add_argument('--reg_type', default="basic", help='The regression type (Fourier/basic)')
-
-    parser.add_argument('--min_target_activation', type=float, default=400, help='The min value for the neuron activation')
     parser.add_argument('--max_iter', type=int, default=100, help='The maximum iterations')
+    parser.add_argument('--print_freq', '-pf', type=int, default=500, help='The printing frequency')
+
+
+    parser.add_argument('--reg_factor', type=float, default=0.2, help='The regression (lambda) value')
+    parser.add_argument('--reg_type', default="Basic", help='The regression type (Fourier/basic)')
     parser.add_argument('--neuron_layer_idx', "-nl", type=int, default=21, help='The index of the require neuron')
     parser.add_argument('-ni', '--neuron_idx_list', type=int, default=[130], action='append', help='The indices of the neuron (-ni=1, -ni=2 -ni=3)')
-
-
-
-
-
-
     return parser.parse_args()
 
 
@@ -67,6 +61,7 @@ def get_network(network_type):
     package = Networks
     return get_object(network_type, package)
 
+
 def get_optimizer(optimizer_type):
     """
     :param optimizer_type: The require optimizer type
@@ -77,9 +72,7 @@ def get_optimizer(optimizer_type):
     return None
 
 
-
-
-def train_main(max_iterations, image_trainer, trained_image):
+def train_main(max_iterations, image_trainer, trained_image, print_freq):
     trained_image = tf.Variable(trained_image)
     train_step = image_trainer.get_step()
     i = 0
@@ -91,7 +84,7 @@ def train_main(max_iterations, image_trainer, trained_image):
             if image_trainer.last_pred.result().numpy() > 0.8:
                 print("trainer achieved the maximum value")
                 break
-            if i%10 == 0:
+            if i%print_freq == 0:
                 print("loss after {} iterations: {}, prediction {}".format(i + 1,
                                       image_trainer.train_loss.result(), image_trainer.last_pred.result()))
         print("Training is stop after {} iterations".format(i))
@@ -103,48 +96,59 @@ def train_main(max_iterations, image_trainer, trained_image):
 
 
 
-def main_by_args(args):
+def basic_visualization(args):
+    args.reg_type = "Basic"
+    visualization_by_args(args)
+
+
+def fourier_visualization(args):
+
+    args.reg_type = "Fourier"
+    visualization_by_args(args)
+
+
+
+def visualization_by_args(args):
+    print("running: ", args)
     tf.keras.backend.set_floatx('float32')
-    weights_loader = AlexNetWeightsLoader()
-    model = get_network(args.nntype)
+
+    # optimizer
     optimizer = get_optimizer(args.optimizer)
-    # im = Image.open("images/poodle.png")
-    # im.show()
 
-
-
-
+    # Loading the image and pre-processing it
     im = create_random_image()
-    im.show()
     I = preprocess_image(im)
 
-    model(I)  # Init graph
+    # Build the network and loads its weights
+    model = get_network(args.nntype)
+    model(I)
+    weights_loader = AlexNetWeightsLoader()
     weights_loader.load(model, args.ckpt_path + "/")
-    model.set_specified_neuron_values(args.neuron_layer_idx, args.neuron_idx_list)
-    trainer = ImageTrainer(model, optimizer, args.reg_type, args.min_target_activation, args.reg_factor)
+    model.set_specified_neuron_values(args.neuron_layer_idx, args.neuron_idx_list)  # specify The neuron to visualize
 
-    learned_image = train_main(args.max_iter, trainer, I)
+    # Build an image trainer object
+    trainer = ImageTrainer(model, optimizer, args.reg_type, args.reg_factor)
+    # The Training process
+    learned_image = train_main(args.max_iter, trainer, I, args.print_freq)
 
+    # convert network output into image and save the results
     learned_image = tensor_to_image(learned_image)
-
-
-
-
     output_path = "learned_images"
     if not os.path.exists(output_path):
         os.mkdir(output_path)
 
-    im.save("learned_images/orig_for_layer_num_{}_neuron_{}.png".format(args.neuron_layer_idx, ' '.join(map(str, args.neuron_idx_list))))
-    learned_image.save("learned_images/image_for_layer_num_{}_neuron_{}.png".format(args.neuron_layer_idx, ' '.join(map(str, args.neuron_idx_list)) ))
+    neuron_repre = ' '.join(map(str, args.neuron_idx_list))
 
-
-
-
+    im.save("learned_images/reg_type_{}_orig_for_layer_num_{}_neuron_{}.png".format(args.reg_type, args.neuron_layer_idx, neuron_repre))
+    learned_image.save("learned_images/reg_type_{}_result_for_layer_num_{}_neuron_{}.png".format(args.reg_type, args.neuron_layer_idx, neuron_repre))
     print("Top1: %d, %s" % (args.neuron_idx_list[0], classes[args.neuron_idx_list[0]]))
+    print("End process")
 
 
 
 
 if __name__ == '__main__':
     args = get_args()
-    main_by_args(args)
+    visualization_by_args(args)
+    # basic_visualization(args)
+    # fourier_visualization(args)
