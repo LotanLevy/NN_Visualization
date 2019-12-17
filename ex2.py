@@ -45,7 +45,7 @@ def get_args():
     parser.add_argument('--min_target_activation', type=float, default=400, help='The min value for the neuron activation')
     parser.add_argument('--max_iter', type=int, default=100, help='The maximum iterations')
     parser.add_argument('--neuron_layer_idx', "-nl", type=int, default=21, help='The index of the require neuron')
-    parser.add_argument('-ni', '--neuron_idx_list', type=int, default=[4], action='append', help='The indices of the neuron (-ni=1, -ni=2 -ni=3)')
+    parser.add_argument('-ni', '--neuron_idx_list', type=int, default=[130], action='append', help='The indices of the neuron (-ni=1, -ni=2 -ni=3)')
 
 
 
@@ -81,17 +81,19 @@ def train_main(max_iterations, image_trainer, trained_image):
     trained_image = tf.Variable(trained_image)
     train_step = image_trainer.get_step()
     i = 0
-    for _ in range(max_iterations):
-        i += 1
-        train_step(trained_image)
-        if image_trainer.train_loss.result().numpy() <= 10:
-            print("trainer achieved the maximum value")
-            break
-        if i%500 == 0:
-            print("loss after {} iterations: {}, prediction {}".format(i + 1,
-                                  image_trainer.train_loss.result(), image_trainer.last_pred.result()))
-    print("Training is stop after {} iterations".format(i))
-    return trained_image
+    try:
+        for _ in range(max_iterations):
+            i += 1
+            train_step(trained_image)
+            if image_trainer.last_pred.result().numpy() > 0.8:
+                print("trainer achieved the maximum value")
+                break
+            if i%500 == 0:
+                print("loss after {} iterations: {}, prediction {}".format(i + 1,
+                                      image_trainer.train_loss.result(), image_trainer.last_pred.result()))
+        print("Training is stop after {} iterations".format(i))
+    finally:
+        return trained_image
 
 
 
@@ -101,6 +103,11 @@ def main_by_args(args):
     model = get_network(args.nntype)
     optimizer = get_optimizer(args.optimizer)
     # im = Image.open("images/poodle.png")
+    # im.show()
+
+
+
+
     im = create_random_image()
     im.show()
     I = preprocess_image(im)
@@ -116,6 +123,7 @@ def main_by_args(args):
 
 
 
+
     output_path = "learned_images"
     if not os.path.exists(output_path):
         os.mkdir(output_path)
@@ -124,10 +132,9 @@ def main_by_args(args):
     learned_image.save("learned_images/image_for_layer_num_{}_neuron_{}.png".format(args.neuron_layer_idx, ' '.join(map(str, args.neuron_idx_list)) ))
 
 
-    # c = model(I)
-    #
-    # top_ind = np.argmax(c)
-    # print("Top1: %d, %s" % (top_ind, classes[top_ind]))
+
+
+    print("Top1: %d, %s" % (args.neuron_idx_list[0], classes[args.neuron_idx_list[0]]))
 
 
 

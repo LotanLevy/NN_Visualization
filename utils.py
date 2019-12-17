@@ -127,7 +127,7 @@ def create_random_image(size=(224, 224, 3)):
 
 def unnormalize_image(image):
     image += [[[104.00698793, 116.66876762, 122.67891434]]]
-    return image[:,:,::-1]
+    return np.uint8(np.flip(image, 2))
 
 
 def clip_0_1(image):
@@ -136,7 +136,7 @@ def clip_0_1(image):
 
 def tensor_to_image(tensor):
     tensor = tensor*255
-    tensor = np.array(tensor, dtype=np.uint8)
+    tensor = unnormalize_image(np.array(tensor, dtype=np.float32))
     if np.ndim(tensor)>3:
         assert tensor.shape[0] == 1
         tensor = tensor[0]
