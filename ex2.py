@@ -80,17 +80,17 @@ def get_optimizer(optimizer_type):
 def train_main(max_iterations, image_trainer, trained_image):
     trained_image = tf.Variable(trained_image)
     train_step = image_trainer.get_step()
-    iter_counter = 0
-    for i in range(max_iterations):
-        iter_counter += 1
+    i = 0
+    while True:
+        i += 1
         train_step(trained_image)
-        if image_trainer.end_training:
+        if image_trainer.train_loss.result().numpy() <= 10:
             print("trainer achieved the maximum value")
             break
-        if i%500==0:
+        if i%500 == 0:
             print("loss after {} iterations: {}, prediction {}".format(i + 1,
                                   image_trainer.train_loss.result(), image_trainer.last_pred.result()))
-    print("Training is stop after {} iterations".format(iter_counter))
+    print("Training is stop after {} iterations".format(i))
     return trained_image
 
 
