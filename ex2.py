@@ -8,6 +8,7 @@ from classes import classes
 
 from utils import *
 from train_test import ImageTrainer
+import matplotlib
 
 
 
@@ -111,13 +112,14 @@ def main_by_args(args):
 
     learned_image = tensor_to_image(learned_image)
 
-    learned_image.show()
+    im.save("learned_images/orig_for_layer_num_{}_neuron_{}".format(args.neuron_layer_idx, args.neuron_idx_list))
+    learned_image.save("learned_images/image_for_layer_num_{}_neuron_{}".format(args.neuron_layer_idx, args.neuron_idx_list))
 
 
-    c = model(I)
-
-    top_ind = np.argmax(c)
-    print("Top1: %d, %s" % (top_ind, classes[top_ind]))
+    # c = model(I)
+    #
+    # top_ind = np.argmax(c)
+    # print("Top1: %d, %s" % (top_ind, classes[top_ind]))
 
 
 
