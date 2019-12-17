@@ -146,11 +146,12 @@ def visualization_by_args(args):
     print("End process")
 
 
+
 def fool_network(args):
     im = Image.open(args.orig_image_path)
     blur_image = im.filter(ImageFilter.GaussianBlur(3))
-    blur_image.show()
-    to_identify = {"orig": im, "blurred": blur_image}
+    sharp_image = im.filter(ImageFilter.UnsharpMask(1))
+    to_identify = {"orig": im, "blurred": blur_image, "sharp": sharp_image}
     for image_name in to_identify:
 
 
@@ -169,14 +170,16 @@ def fool_network(args):
 
         score = np.max(c)
         top_ind = np.argmax(c)
-        print("%s: %d, %s with score %f" % (image_name, top_ind, classes[top_ind], score))
+        title = "{}: {}, {} with score {}".format(image_name, top_ind, classes[top_ind], score)
+        print(title)
+        to_identify[image_name].save(title + ".png")
 
 
 
 if __name__ == '__main__':
     args = get_args()
-    # fool_network(args)
-    visualization_by_args(args)
+    fool_network(args)
+    # visualization_by_args(args)
     # basic_visualization(args)
     # fourier_visualization(args)
 
