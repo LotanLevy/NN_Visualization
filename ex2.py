@@ -178,8 +178,8 @@ def fool_network(args):
 
 if __name__ == '__main__':
     args = get_args()
-    fool_network(args)
-    # visualization_by_args(args)
+    # fool_network(args)
+    visualization_by_args(args)
     # basic_visualization(args)
     # fourier_visualization(args)
 
