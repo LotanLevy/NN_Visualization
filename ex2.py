@@ -8,7 +8,8 @@ from classes import classes
 
 from utils import *
 from train_test import ImageTrainer
-import matplotlib
+import os
+
 
 
 
@@ -42,7 +43,7 @@ def get_args():
     parser.add_argument('--image_path', default="", help='The path to keep the learned image')
     parser.add_argument('--reg_factor', type=float, default=0.2, help='The regression (lambda) value')
     parser.add_argument('--min_target_activation', type=float, default=400, help='The min value for the neuron activation')
-    parser.add_argument('--max_iter', type=int, default=5000, help='The maximum iterations')
+    parser.add_argument('--max_iter', type=int, default=100, help='The maximum iterations')
     parser.add_argument('--neuron_layer_idx', "-nl", type=int, default=21, help='The index of the require neuron')
     parser.add_argument('-ni', '--neuron_idx_list', type=int, default=[0], action='append', help='The indices of the neuron (-ni=1, -ni=2 -ni=3)')
 
@@ -112,8 +113,14 @@ def main_by_args(args):
 
     learned_image = tensor_to_image(learned_image)
 
-    im.save("learned_images/orig_for_layer_num_{}_neuron_{}".format(args.neuron_layer_idx, args.neuron_idx_list))
-    learned_image.save("learned_images/image_for_layer_num_{}_neuron_{}".format(args.neuron_layer_idx, args.neuron_idx_list))
+
+
+    output_path = "learned_images"
+    if not os.path.exists(output_path):
+        os.mkdir(output_path)
+
+    im.save("learned_images/orig_for_layer_num_{}_neuron_{}.png".format(args.neuron_layer_idx, ' '.join(map(str, args.neuron_idx_list))))
+    learned_image.save("learned_images/image_for_layer_num_{}_neuron_{}.png".format(args.neuron_layer_idx, ' '.join(map(str, args.neuron_idx_list)) ))
 
 
     # c = model(I)
@@ -127,6 +134,3 @@ def main_by_args(args):
 if __name__ == '__main__':
     args = get_args()
     main_by_args(args)
-
-
-
