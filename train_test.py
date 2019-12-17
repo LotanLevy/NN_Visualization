@@ -15,6 +15,8 @@ class ImageTrainer:
         self.regression_factor = np.float32(regression_factor)
         self.end_training = False
         self.train_loss = tf.keras.metrics.Mean(name='train_loss')
+        self.last_pred = tf.keras.metrics.Mean(name='last_pred')
+
 
 
 
@@ -33,8 +35,11 @@ class ImageTrainer:
         return train_step
 
     def calculate_loss(self, prediction, image):
-        square_norm = tf.math.reduce_mean(tf.math.square(tf.math.sqrt(tf.math.square(image))))
+        square_norm = tf.reduce_mean(tf.square(tf.sqrt(tf.square(image))))
         loss = -(prediction - self.regression_factor * square_norm)
+        self.last_pred.reset_states()
+        self.last_pred(prediction)
+
         return loss
 
 

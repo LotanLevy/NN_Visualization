@@ -60,7 +60,6 @@ class Alexnet(NN):
     def call(self, x):
         for i in range(self.max_layer_index + 1):
             x = self.all_layers[i](x)
-
         return self.get_neuron_values(x)
 
 

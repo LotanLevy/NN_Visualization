@@ -41,7 +41,7 @@ def get_args():
     # parser.add_argument('--dstype', default="num", help='The type of the dataset')
     parser.add_argument('--ckpt_path', default="weights", help='The type of the network')
     parser.add_argument('--image_path', default="", help='The path to keep the learned image')
-    parser.add_argument('--reg_factor', type=float, default=0.2, help='The regression (lambda) value')
+    parser.add_argument('--reg_factor', type=float, default=0.00002, help='The regression (lambda) value')
     parser.add_argument('--min_target_activation', type=float, default=400, help='The min value for the neuron activation')
     parser.add_argument('--max_iter', type=int, default=100, help='The maximum iterations')
     parser.add_argument('--neuron_layer_idx', "-nl", type=int, default=21, help='The index of the require neuron')
@@ -88,8 +88,8 @@ def train_main(max_iterations, image_trainer, trained_image):
             print("trainer achieved the maximum value")
             break
         if i%10==0:
-            print("loss after {} iterations: {}".format(i + 1,
-                                  image_trainer.train_loss.result()))
+            print("loss after {} iterations: {}, prediction {}".format(i + 1,
+                                  image_trainer.train_loss.result(), image_trainer.last_pred.result()))
     print("Training is stop after {} iterations".format(iter_counter))
     return trained_image
 
