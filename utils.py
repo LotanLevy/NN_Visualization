@@ -125,6 +125,11 @@ def preprocess_image(im):
 def create_random_image(size=(224, 224, 3)):
     return Image.fromarray(np.uint8(np.abs(np.random.normal(size=size))*255))
 
+def add_random_noise(image):
+    noise = np.random.normal(0, 1, image.shape)
+    result = image + noise
+    return result
+
 def unnormalize_image(image):
     image += [[[104.00698793, 116.66876762, 122.67891434]]]
     return np.uint8(np.flip(image, 2))

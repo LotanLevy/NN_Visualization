@@ -37,6 +37,8 @@ def get_args():
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('--nntype', default="Alexnet", help='The type of the network')
     parser.add_argument('--optimizer', '-opt', default="adam", help='optimizer  type')
+    parser.add_argument('--orig_image_path', help='The path of image to read')
+
 
     parser.add_argument('--ckpt_path', default="weights", help='The type of the network')
     parser.add_argument('--image_path', default="", help='The path to keep the learned image')
@@ -147,10 +149,29 @@ def visualization_by_args(args):
     print("End process")
 
 
+def fool_network(args):
+    im = Image.open(args.orig_image_path)
+    I = preprocess_image(im)
+
+    # Build the network and loads its weights
+    model = get_network(args.nntype)
+    model(I)
+    weights_loader = AlexNetWeightsLoader()
+    weights_loader.load(model, args.ckpt_path + "/")
+
+    c = model(I)
+
+    c = tf.cast(c, tf.float32).numpy()
+
+    score = np.max(c)
+    top_ind = np.argmax(c)
+    print("Top1: %d, %s with score %f" % (top_ind, classes[top_ind], score))
+
 
 
 if __name__ == '__main__':
     args = get_args()
-    visualization_by_args(args)
+    fool_network(args)
+    # visualization_by_args(args)
     # basic_visualization(args)
     # fourier_visualization(args)
