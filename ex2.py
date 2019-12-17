@@ -87,7 +87,7 @@ def train_main(max_iterations, image_trainer, trained_image):
         if image_trainer.end_training:
             print("trainer achieved the maximum value")
             break
-        if i%10==0:
+        if i%500==0:
             print("loss after {} iterations: {}".format(i + 1,
                                   image_trainer.train_loss.result()))
     print("Training is stop after {} iterations".format(iter_counter))
