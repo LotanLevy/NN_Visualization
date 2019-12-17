@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import argparse
 import tensorflow as tf
 import numpy as np
-from PIL import Image
+from PIL import ImageFilter
 from classes import classes
 
 from utils import *
@@ -76,8 +76,9 @@ def get_optimizer(optimizer_type):
     return None
 
 
-def train_main(max_iterations, image_trainer, trained_image, print_freq, max_pred_val):
+def train_main(max_iterations, image_trainer, trained_image, print_freq, max_pred_val, reg_type):
     trained_image = tf.Variable(trained_image)
+
     train_step = image_trainer.get_step()
     i = 0
     for _ in range(max_iterations):
@@ -90,6 +91,8 @@ def train_main(max_iterations, image_trainer, trained_image, print_freq, max_pre
             print("loss after {} iterations: {}, prediction {}".format(i + 1,
                                   image_trainer.train_loss.result(), image_trainer.last_pred.result()))
     print("Training is stop after {} iterations".format(i))
+    if reg_type == "Fourier":
+        trained_image = tf.cast(tf.signal.ifft(tf.cast(trained_image, tf.complex64)), tf.float32)
     return trained_image
 
 
@@ -128,7 +131,7 @@ def visualization_by_args(args):
     # Build an image trainer object
     trainer = ImageTrainer(model, optimizer, args.reg_type, args.reg_factor)
     # The Training process
-    learned_image = train_main(args.max_iter, trainer, I, args.print_freq, args.max_pred_value)
+    learned_image = train_main(args.max_iter, trainer, I, args.print_freq, args.max_pred_value, args.reg_type)
 
     # convert network output into image and save the results
     learned_image = tensor_to_image(learned_image)
@@ -145,20 +148,28 @@ def visualization_by_args(args):
 
 def fool_network(args):
     im = Image.open(args.orig_image_path)
-    I = preprocess_image(im)
-    # Build the network and loads its weights
-    model = get_network(args.nntype)
-    model(I)
-    weights_loader = AlexNetWeightsLoader()
-    weights_loader.load(model, args.ckpt_path + "/")
+    blur_image = im.filter(ImageFilter.GaussianBlur(3))
+    blur_image.show()
+    to_identify = {"orig": im, "blurred": blur_image}
+    for image_name in to_identify:
 
-    c = model(I)
 
-    c = tf.cast(c, tf.float32).numpy()
+        I = preprocess_image(to_identify[image_name])
 
-    score = np.max(c)
-    top_ind = np.argmax(c)
-    print("Top1: %d, %s with score %f" % (top_ind, classes[top_ind], score))
+
+        # Build the network and loads its weights
+        model = get_network(args.nntype)
+        model(I)
+        weights_loader = AlexNetWeightsLoader()
+        weights_loader.load(model, args.ckpt_path + "/")
+
+        c = model(I)
+
+        c = tf.cast(c, tf.float32).numpy()
+
+        score = np.max(c)
+        top_ind = np.argmax(c)
+        print("%s: %d, %s with score %f" % (image_name, top_ind, classes[top_ind], score))
 
 
 
@@ -168,3 +179,4 @@ if __name__ == '__main__':
     visualization_by_args(args)
     # basic_visualization(args)
     # fourier_visualization(args)
+
