@@ -87,10 +87,11 @@ def train_main(max_iterations, image_trainer, trained_image):
         if image_trainer.end_training:
             print("trainer achieved the maximum value")
             break
-        if i%1000==0:
-            print(i)
+        if i%10==0:
+            print("loss after {} iterations: {}".format(i + 1,
+                                  image_trainer.train_loss.result()))
     print("Training is stop after {} iterations".format(iter_counter))
-    return clip_0_1(trained_image)
+    return trained_image
 
 
 
@@ -99,7 +100,7 @@ def main_by_args(args):
     weights_loader = AlexNetWeightsLoader()
     model = get_network(args.nntype)
     optimizer = get_optimizer(args.optimizer)
-
+    # im = Image.open("images/poodle.png")
     im = create_random_image()
     im.show()
     I = preprocess_image(im)

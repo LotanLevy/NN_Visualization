@@ -123,7 +123,11 @@ def preprocess_image(im):
     return I
 
 def create_random_image(size=(224, 224, 3)):
-    return Image.fromarray(np.uint8(np.random.normal(size=size)*255))
+    return Image.fromarray(np.uint8(np.abs(np.random.normal(size=size))*255))
+
+def unnormalize_image(image):
+    image += [[[104.00698793, 116.66876762, 122.67891434]]]
+    return image[:,:,::-1]
 
 
 def clip_0_1(image):
@@ -137,6 +141,7 @@ def tensor_to_image(tensor):
         assert tensor.shape[0] == 1
         tensor = tensor[0]
     return Image.fromarray(tensor)
+
 
 def tensor_to_numpy(tensor):
     return np.array(tensor)

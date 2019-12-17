@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function
 import tensorflow as tf
 
 import numpy as np
@@ -13,19 +14,8 @@ class ImageTrainer:
         self.min_value_target = tf.constant(min_value_target, dtype=tf.float32)
         self.regression_factor = np.float32(regression_factor)
         self.end_training = False
+        self.train_loss = tf.keras.metrics.Mean(name='train_loss')
 
-    # def get_step(self):
-    #     @tf.function
-    #     def train_step():
-    #         with tf.GradientTape() as tape:
-    #             prediction = self.target_neuron(self.image )
-    #             loss = self.calculate_loss(prediction, self.image)
-    #             if prediction >= self.min_value_target:
-    #                 self.end_training = True
-    #
-    #         gradients = tape.gradient(loss, self.image)
-    #         self.optimizer.apply_gradients([(gradients, self.image)])
-    #     return train_step
 
 
     def get_step(self):
@@ -38,6 +28,7 @@ class ImageTrainer:
 
             gradients = tape.gradient(loss, image)
             self.optimizer.apply_gradients([(gradients, image)])
+            self.train_loss(loss)
 
         return train_step
 
