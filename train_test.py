@@ -26,7 +26,7 @@ class ImageTrainer:
         def train_step(image):
             with tf.GradientTape() as tape:
                 prediction = self.target_neuron(image)
-                loss = self.calculate_loss(prediction, tf.identity(image))
+                loss = self.calculate_loss(prediction, tf.identity(image.read_value()))
 
             gradients = tape.gradient(loss, image)
             self.optimizer.apply_gradients([(gradients, image)])
@@ -40,7 +40,6 @@ class ImageTrainer:
             w = tf.cast(tf.linalg.norm(fft_image), tf.float32)
             reg = tf.cast(tf.reduce_mean(tf.abs(fft_image) - 1/w), tf.float32)
 
-            tf.cast(tf.signal.ifft(image), tf.float32)
         else:
             reg = self.regression_factor * tf.reduce_mean(tf.square(tf.sqrt(tf.square(image))))
         loss = -(prediction - reg)

@@ -80,23 +80,18 @@ def train_main(max_iterations, image_trainer, trained_image, print_freq, max_pre
     trained_image = tf.Variable(trained_image)
     train_step = image_trainer.get_step()
     i = 0
-    try:
+    for _ in range(max_iterations):
+        i += 1
+        train_step(trained_image)
+        if image_trainer.last_pred.result().numpy() > max_pred_val:
+            print("trainer achieved the maximum value")
+            break
+        if i%print_freq == 0:
+            print("loss after {} iterations: {}, prediction {}".format(i + 1,
+                                  image_trainer.train_loss.result(), image_trainer.last_pred.result()))
+    print("Training is stop after {} iterations".format(i))
+    return trained_image
 
-        for _ in range(max_iterations):
-            i += 1
-            train_step(trained_image)
-            if image_trainer.last_pred.result().numpy() > max_pred_val:
-                print("trainer achieved the maximum value")
-                break
-            if i%print_freq == 0:
-                print("loss after {} iterations: {}, prediction {}".format(i + 1,
-                                      image_trainer.train_loss.result(), image_trainer.last_pred.result()))
-        print("Training is stop after {} iterations".format(i))
-        return trained_image
-    except Exception as e:
-        raise e
-    finally:
-        return trained_image
 
 
 
@@ -145,14 +140,12 @@ def visualization_by_args(args):
 
     im.save("learned_images/reg_type_{}_orig_for_layer_num_{}_neuron_{}.png".format(args.reg_type, args.neuron_layer_idx, neuron_repre))
     learned_image.save("learned_images/reg_type_{}_result_for_layer_num_{}_neuron_{}.png".format(args.reg_type, args.neuron_layer_idx, neuron_repre))
-    print("Top1: %d, %s" % (args.neuron_idx_list[0], classes[args.neuron_idx_list[0]]))
     print("End process")
 
 
 def fool_network(args):
     im = Image.open(args.orig_image_path)
     I = preprocess_image(im)
-
     # Build the network and loads its weights
     model = get_network(args.nntype)
     model(I)
