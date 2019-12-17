@@ -42,6 +42,8 @@ def get_args():
     parser.add_argument('--image_path', default="", help='The path to keep the learned image')
     parser.add_argument('--max_iter', type=int, default=100, help='The maximum iterations')
     parser.add_argument('--print_freq', '-pf', type=int, default=500, help='The printing frequency')
+    parser.add_argument('--max_pred_value', '-pv', type=float, default=0.95, help='Max prediction value')
+
 
 
     parser.add_argument('--reg_factor', type=float, default=0.2, help='The regression (lambda) value')
@@ -72,7 +74,7 @@ def get_optimizer(optimizer_type):
     return None
 
 
-def train_main(max_iterations, image_trainer, trained_image, print_freq):
+def train_main(max_iterations, image_trainer, trained_image, print_freq, max_pred_val):
     trained_image = tf.Variable(trained_image)
     train_step = image_trainer.get_step()
     i = 0
@@ -81,7 +83,7 @@ def train_main(max_iterations, image_trainer, trained_image, print_freq):
         for _ in range(max_iterations):
             i += 1
             train_step(trained_image)
-            if image_trainer.last_pred.result().numpy() > 0.8:
+            if image_trainer.last_pred.result().numpy() > max_pred_val:
                 print("trainer achieved the maximum value")
                 break
             if i%print_freq == 0:
@@ -129,7 +131,7 @@ def visualization_by_args(args):
     # Build an image trainer object
     trainer = ImageTrainer(model, optimizer, args.reg_type, args.reg_factor)
     # The Training process
-    learned_image = train_main(args.max_iter, trainer, I, args.print_freq)
+    learned_image = train_main(args.max_iter, trainer, I, args.print_freq, args.max_pred_value)
 
     # convert network output into image and save the results
     learned_image = tensor_to_image(learned_image)
