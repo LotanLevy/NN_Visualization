@@ -57,10 +57,11 @@ class AlexNetWeightsLoader:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
 class Plotter:
-    def __init__(self, plots_names, title):
+    def __init__(self, plots_names, title, output_path):
         self.x = dict()
         self.y = dict()
         self.title = title
+        self.output_path = output_path
         for name in plots_names:
             self.x[name] = []
             self.y[name] = []
@@ -79,7 +80,9 @@ class Plotter:
         plt.xlabel("itarations")
         plt.ylabel("value")
         plt.title(self.title)
-        plt.savefig( self.title + ".png")
+        if not os.path.exists(output_path):
+            os.mkdir(output_path)
+        plt.savefig(os.path.join(self.output_path, self.title + ".png"))
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~#

@@ -78,10 +78,10 @@ def get_optimizer(optimizer_type):
     return None
 
 
-def train_main(max_iterations, image_trainer, trained_image, print_freq, max_pred_val, plot_title):
+def train_main(max_iterations, image_trainer, trained_image, print_freq, max_pred_val, plot_title, plot_path):
     trained_image = tf.Variable(trained_image)
-    loss_plotter = Plotter(["loss"], plot_title + "[loss]")
-    pred_plotter = Plotter(["prediction"], plot_title + "[prediction]")
+    loss_plotter = Plotter(["loss"], plot_title + "[loss]", plot_path)
+    pred_plotter = Plotter(["prediction"], plot_title + "[prediction]", plot_path)
 
 
     train_step = image_trainer.get_step()
@@ -142,18 +142,21 @@ def visualization_by_args(args):
 
     # Build an image trainer object
     trainer = ImageTrainer(model, optimizer, args.reg_type, args.reg_factor)
-    # The Training process
-    learned_image = train_main(args.max_iter, trainer, I, args.print_freq, args.max_pred_value, result_title)
-
-    # convert network output into image and save the results
-    learned_image = tensor_to_image(learned_image)
+    
     output_path = os.join(args.image_path, "learned_images")
     if not os.path.exists(output_path):
         os.mkdir(output_path)
 
+    # The Training process
+    learned_image = train_main(args.max_iter, trainer, I, args.print_freq, args.max_pred_value, result_title, output_path)
 
-    im.save(os.join(output_path, "reg_type_{}_orig_for_layer_num_{}_neuron_{}.png".format(args.reg_type, args.neuron_layer_idx, neuron_repre)))
-    learned_image.save(os.join(output_path, "{}.png".format(result_title)))
+    # convert network output into image and save the results
+    learned_image = tensor_to_image(learned_image)
+
+
+
+    im.save(os.path.join(output_path, "reg_type_{}_orig_for_layer_num_{}_neuron_{}.png".format(args.reg_type, args.neuron_layer_idx, neuron_repre)))
+    learned_image.save(os.path.join(output_path, "{}.png".format(result_title)))
     print("End process")
 
 
