@@ -73,6 +73,7 @@ class Plotter:
         plt.figure()
         for name in self.x.keys():
             plt.plot(self.x[name], self.y[name], label=name)
+        print(self.x)
         plt.legend()
         plt.xlabel("itarations")
         plt.ylabel("value")

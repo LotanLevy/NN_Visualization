@@ -80,8 +80,8 @@ def get_optimizer(optimizer_type):
 
 def train_main(max_iterations, image_trainer, trained_image, print_freq, max_pred_val, plot_title):
     trained_image = tf.Variable(trained_image)
-    loss_plotter = Plotter(["loss"], plot_title)
-    pred_plotter = Plotter(["prediction"], plot_title)
+    loss_plotter = Plotter(["loss"], plot_title + "[loss]")
+    pred_plotter = Plotter(["prediction"], plot_title + "[prediction]")
 
 
     train_step = image_trainer.get_step()
