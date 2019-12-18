@@ -78,8 +78,11 @@ def get_optimizer(optimizer_type):
     return None
 
 
-def train_main(max_iterations, image_trainer, trained_image, print_freq, max_pred_val, reg_type):
+def train_main(max_iterations, image_trainer, trained_image, print_freq, max_pred_val, plot_title):
     trained_image = tf.Variable(trained_image)
+    loss_plotter = Plotter(["loss"], plot_title)
+    pred_plotter = Plotter(["prediction"], plot_title)
+
 
     train_step = image_trainer.get_step()
     i = 0
@@ -92,7 +95,12 @@ def train_main(max_iterations, image_trainer, trained_image, print_freq, max_pre
         if i%print_freq == 0:
             print("loss after {} iterations: {}, prediction {}".format(i + 1,
                                   image_trainer.train_loss.result(), image_trainer.last_pred.result()))
+            loss_plotter.add("loss", i+1, image_trainer.train_loss.result())
+            pred_plotter.add("prediction", i+1, image_trainer.last_pred.result())
+
     print("Training is stop after {} iterations".format(i))
+    loss_plotter.plot()
+    pred_plotter.plot()
     return trained_image
 
 
@@ -128,10 +136,14 @@ def visualization_by_args(args):
     weights_loader.load(model, args.ckpt_path + "/")
     model.set_specified_neuron_values(args.neuron_layer_idx, args.neuron_idx_list)  # specify The neuron to visualize
 
+    neuron_repre = ' '.join(map(str, args.neuron_idx_list))
+
+    result_title = "result_with_reg_type_{}_for_layer_num_{}_neuron_{}".format(args.reg_type, args.neuron_layer_idx, neuron_repre)
+
     # Build an image trainer object
     trainer = ImageTrainer(model, optimizer, args.reg_type, args.reg_factor)
     # The Training process
-    learned_image = train_main(args.max_iter, trainer, I, args.print_freq, args.max_pred_value, args.reg_type)
+    learned_image = train_main(args.max_iter, trainer, I, args.print_freq, args.max_pred_value, result_title)
 
     # convert network output into image and save the results
     learned_image = tensor_to_image(learned_image)
@@ -139,10 +151,9 @@ def visualization_by_args(args):
     if not os.path.exists(output_path):
         os.mkdir(output_path)
 
-    neuron_repre = ' '.join(map(str, args.neuron_idx_list))
 
     im.save("learned_images/reg_type_{}_orig_for_layer_num_{}_neuron_{}.png".format(args.reg_type, args.neuron_layer_idx, neuron_repre))
-    learned_image.save("learned_images/reg_type_{}_result_for_layer_num_{}_neuron_{}.png".format(args.reg_type, args.neuron_layer_idx, neuron_repre))
+    learned_image.save("learned_images/{}.png".format(result_title))
     print("End process")
 
 

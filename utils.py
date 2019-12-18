@@ -57,8 +57,7 @@ class AlexNetWeightsLoader:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
 class Plotter:
-    def __init__(self, plots_names, network_name, title):
-        self.network_name = network_name
+    def __init__(self, plots_names, title):
         self.x = dict()
         self.y = dict()
         self.title = title
@@ -75,8 +74,10 @@ class Plotter:
         for name in self.x.keys():
             plt.plot(self.x[name], self.y[name], label=name)
         plt.legend()
-        plt.title(self.title + " for " + self.network_name + " network")
-        plt.savefig(self.network_name + " " + self.title + ".png")
+        plt.xlabel("itarations")
+        plt.ylabel("value")
+        plt.title(self.title)
+        plt.savefig( self.title + ".png")
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~#
