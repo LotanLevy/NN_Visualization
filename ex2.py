@@ -38,6 +38,8 @@ def get_args():
     parser.add_argument('--nntype', default="Alexnet", help='The type of the network')
     parser.add_argument('--optimizer', '-opt', default="adam", help='optimizer  type')
     parser.add_argument('--orig_image_path', help='The path of image to read')
+    parser.add_argument('--crop_size', type=int, default=224, help='The crop size of the image')
+
 
 
     parser.add_argument('--ckpt_path', default="weights", help='The type of the network')
@@ -117,7 +119,7 @@ def visualization_by_args(args):
 
     # Loading the image and pre-processing it
     im = create_random_image()
-    I = preprocess_image(im)
+    I = preprocess_image(im, args.crop_size)
 
     # Build the network and loads its weights
     model = get_network(args.nntype)

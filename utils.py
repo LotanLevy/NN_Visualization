@@ -112,8 +112,8 @@ def get_object(object_type, package, *args):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
 
-def preprocess_image(im):
-    im = im.resize([224, 224])
+def preprocess_image(im, crop_size=224):
+    im = im.resize([crop_size, crop_size])
     I = np.asarray(im).astype(np.float32)
     I = I[:, :, :3]
 
