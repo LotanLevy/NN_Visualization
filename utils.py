@@ -8,6 +8,7 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image
 import sys
+import os
 
 
 import zipfile
@@ -74,8 +75,6 @@ class Plotter:
         plt.figure()
         for name in self.x.keys():
             plt.plot(self.x[name], self.y[name], label=name)
-        print(self.y)
-        print(self.x)
         plt.legend()
         plt.xlabel("itarations")
         plt.ylabel("value")
