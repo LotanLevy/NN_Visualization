@@ -91,8 +91,6 @@ def train_main(max_iterations, image_trainer, trained_image, print_freq, max_pre
             print("loss after {} iterations: {}, prediction {}".format(i + 1,
                                   image_trainer.train_loss.result(), image_trainer.last_pred.result()))
     print("Training is stop after {} iterations".format(i))
-    if reg_type == "Fourier":
-        trained_image = tf.cast(tf.signal.ifft(tf.cast(trained_image, tf.complex64)), tf.float32)
     return trained_image
 
 
