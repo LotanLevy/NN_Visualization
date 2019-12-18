@@ -142,8 +142,8 @@ def visualization_by_args(args):
 
     # Build an image trainer object
     trainer = ImageTrainer(model, optimizer, args.reg_type, args.reg_factor)
-    
-    output_path = os.join(args.image_path, "learned_images")
+
+    output_path = os.path.join(args.image_path, "learned_images")
     if not os.path.exists(output_path):
         os.mkdir(output_path)
 
