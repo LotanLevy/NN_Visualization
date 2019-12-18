@@ -147,13 +147,13 @@ def visualization_by_args(args):
 
     # convert network output into image and save the results
     learned_image = tensor_to_image(learned_image)
-    output_path = "learned_images"
+    output_path = os.join(args.image_path, "learned_images")
     if not os.path.exists(output_path):
         os.mkdir(output_path)
 
 
-    im.save("learned_images/reg_type_{}_orig_for_layer_num_{}_neuron_{}.png".format(args.reg_type, args.neuron_layer_idx, neuron_repre))
-    learned_image.save("learned_images/{}.png".format(result_title))
+    im.save(os.join(output_path, "reg_type_{}_orig_for_layer_num_{}_neuron_{}.png".format(args.reg_type, args.neuron_layer_idx, neuron_repre)))
+    learned_image.save(os.join(output_path, "{}.png".format(result_title)))
     print("End process")
 
 
