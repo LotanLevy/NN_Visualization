@@ -28,7 +28,7 @@ class Alexnet(NN):
 
         # Fully-connected layers
         self.flatten = Flatten()
-        self.dense1 = Dense(4096, input_shape=(100,))
+        self.dense1 = Dense(4096)
         self.dense2 = Dense(4096)
         self.dense3 = Dense(1000)
 
