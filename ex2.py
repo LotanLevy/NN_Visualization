@@ -84,24 +84,25 @@ def train_main(max_iterations, image_trainer, trained_image, print_freq, max_pre
     pred_plotter = Plotter(["prediction"], plot_title + "[prediction]", plot_path)
 
 
-    train_step = image_trainer.get_step()
-    i = 0
-    for _ in range(max_iterations):
-        i += 1
-        train_step(trained_image)
-        if image_trainer.last_pred.result().numpy() > max_pred_val:
-            print("trainer achieved the maximum value")
-            break
-        if i%print_freq == 0:
-            print("loss after {} iterations: {}, prediction {}".format(i + 1,
-                                  image_trainer.train_loss.result(), image_trainer.last_pred.result()))
-            loss_plotter.add("loss", i+1, image_trainer.train_loss.result())
-            pred_plotter.add("prediction", i+1, image_trainer.last_pred.result())
-
-    print("Training is stop after {} iterations".format(i))
-    loss_plotter.plot()
-    pred_plotter.plot()
-    return trained_image
+    try:
+        train_step = image_trainer.get_step()
+        i = 0
+        for _ in range(max_iterations):
+            i += 1
+            train_step(trained_image)
+            if image_trainer.last_pred.result().numpy() > max_pred_val:
+                print("trainer achieved the maximum value")
+                break
+            if i%print_freq == 0:
+                print("loss after {} iterations: {}, prediction {}".format(i + 1,
+                                      image_trainer.train_loss.result(), image_trainer.last_pred.result()))
+                loss_plotter.add("loss", i+1, image_trainer.train_loss.result())
+                pred_plotter.add("prediction", i+1, image_trainer.last_pred.result())
+    finally:
+        print("Training is stop after {} iterations".format(i))
+        loss_plotter.plot()
+        pred_plotter.plot()
+        return trained_image
 
 
 
