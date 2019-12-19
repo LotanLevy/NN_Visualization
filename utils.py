@@ -80,7 +80,7 @@ class Plotter:
         plt.ylabel("value")
         plt.title(self.title)
         if not os.path.exists(self.output_path):
-            os.mkdir(output_path)
+            os.mkdir(self.output_path)
         plt.savefig(os.path.join(self.output_path, self.title + ".png"))
 
 
