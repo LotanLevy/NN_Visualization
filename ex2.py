@@ -53,7 +53,7 @@ def get_args():
     parser.add_argument('--reg_factor', type=float, default=0.2, help='The regression (lambda) value')
     parser.add_argument('--reg_type', default="Basic", help='The regression type (Fourier/basic)')
     parser.add_argument('--neuron_layer_idx', "-nl", type=int, default=21, help='The index of the require neuron')
-    parser.add_argument('-ni', '--neuron_idx_list', type=int, default=[130], action='append', help='The indices of the neuron (-ni=1, -ni=2 -ni=3)')
+    parser.add_argument('-ni', '--neuron_idx_list', type=int, default=[], action='append', help='The indices of the neuron (-ni=1, -ni=2 -ni=3)')
     return parser.parse_args()
 
 
