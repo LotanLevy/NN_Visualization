@@ -66,7 +66,7 @@ class Alexnet(NN):
         return result
 
     def get_relevant_layer(self):
-        neuron = self.all_layers[self.max_layer_index][0]
+        neuron = self.all_layers[self.max_layer_index]
         return neuron
 
 
