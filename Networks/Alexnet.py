@@ -51,6 +51,7 @@ class Alexnet(NN):
         self.neuron_indices = neuron_indices
 
     def get_neuron_values(self, result):
+        print(self.neuron_indices)
         if len(self.neuron_indices) > 0:
             result = result[0]
             for idx in self.neuron_indices:
