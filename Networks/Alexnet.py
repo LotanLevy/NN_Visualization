@@ -32,7 +32,7 @@ class Alexnet(NN):
         self.dense2 = Dense(4096, trainable=False)
         self.dense3 = Dense(1000, trainable=False)
 
-        self.norm1 = lambda x: tf.nn.local_response_normalization(x, depth_radius=2, alpha=2e-05, beta=0.75, bias=1.0, trainable=False)
+        self.norm1 = lambda x: tf.nn.local_response_normalization(x, depth_radius=2, alpha=2e-05, beta=0.75, bias=1.0)
         self.concat2 = lambda x: tf.concat((self.conv2a(x[:, :, :, :48]), self.conv2b(x[:, :, :, 48:])), 3)
         self.concat4 = lambda x: tf.concat((self.conv4a(x[:, :, :, :192]), self.conv4b(x[:, :, :, 192:])), 3)
         self.concat5 = lambda x: tf.concat((self.conv5a(x[:, :, :, :192]), self.conv5b(x[:, :, :, 192:])), 3)
