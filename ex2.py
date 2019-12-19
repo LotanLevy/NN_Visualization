@@ -90,7 +90,6 @@ def train_main(max_iterations, image_trainer, trained_image, print_freq, max_pre
     for _ in range(max_iterations):
         i += 1
         train_step(trained_image)
-        print(trained_image)
         if image_trainer.last_pred.result().numpy() > max_pred_val:
             print("trainer achieved the maximum value")
             break
@@ -100,6 +99,7 @@ def train_main(max_iterations, image_trainer, trained_image, print_freq, max_pre
             loss_plotter.add("loss", i+1, image_trainer.train_loss.result())
             pred_plotter.add("prediction", i+1, image_trainer.last_pred.result())
     print("Training is stop after {} iterations".format(i))
+    print(trained_image)
 
     loss_plotter.plot()
     pred_plotter.plot()
