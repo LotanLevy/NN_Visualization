@@ -17,22 +17,22 @@ class Alexnet(NN):
         self.softmax = Activation('softmax')
 
         # Conv layers
-        self.conv1 = Conv2D(filters=96, input_shape=(224, 224, 3), kernel_size=(11, 11), strides=(4, 4), padding='same')
-        self.conv2a = Conv2D(filters=128, kernel_size=(5, 5), strides=(1, 1), padding='same')
-        self.conv2b = Conv2D(filters=128, kernel_size=(5, 5), strides=(1, 1), padding='same')
-        self.conv3 = Conv2D(filters=384, kernel_size=(3, 3), strides=(1, 1), padding='same')
-        self.conv4a = Conv2D(filters=192, kernel_size=(3, 3), strides=(1, 1), padding='same')
-        self.conv4b = Conv2D(filters=192, kernel_size=(3, 3), strides=(1, 1), padding='same')
-        self.conv5a = Conv2D(filters=128, kernel_size=(3, 3), strides=(1, 1), padding='same')
-        self.conv5b = Conv2D(filters=128, kernel_size=(3, 3), strides=(1, 1), padding='same')
+        self.conv1 = Conv2D(filters=96, input_shape=(224, 224, 3), kernel_size=(11, 11), strides=(4, 4), padding='same', trainable=False)
+        self.conv2a = Conv2D(filters=128, kernel_size=(5, 5), strides=(1, 1), padding='same', trainable=False)
+        self.conv2b = Conv2D(filters=128, kernel_size=(5, 5), strides=(1, 1), padding='same', trainable=False)
+        self.conv3 = Conv2D(filters=384, kernel_size=(3, 3), strides=(1, 1), padding='same', trainable=False)
+        self.conv4a = Conv2D(filters=192, kernel_size=(3, 3), strides=(1, 1), padding='same', trainable=False)
+        self.conv4b = Conv2D(filters=192, kernel_size=(3, 3), strides=(1, 1), padding='same', trainable=False)
+        self.conv5a = Conv2D(filters=128, kernel_size=(3, 3), strides=(1, 1), padding='same', trainable=False)
+        self.conv5b = Conv2D(filters=128, kernel_size=(3, 3), strides=(1, 1), padding='same', trainable=False)
 
         # Fully-connected layers
         self.flatten = Flatten()
-        self.dense1 = Dense(4096, input_shape=(100,))
-        self.dense2 = Dense(4096)
-        self.dense3 = Dense(1000)
+        self.dense1 = Dense(4096, input_shape=(100,), trainable=False)
+        self.dense2 = Dense(4096, trainable=False)
+        self.dense3 = Dense(1000, trainable=False)
 
-        self.norm1 = lambda x: tf.nn.local_response_normalization(x, depth_radius=2, alpha=2e-05, beta=0.75, bias=1.0)
+        self.norm1 = lambda x: tf.nn.local_response_normalization(x, depth_radius=2, alpha=2e-05, beta=0.75, bias=1.0, trainable=False)
         self.concat2 = lambda x: tf.concat((self.conv2a(x[:, :, :, :48]), self.conv2b(x[:, :, :, 48:])), 3)
         self.concat4 = lambda x: tf.concat((self.conv4a(x[:, :, :, :192]), self.conv4b(x[:, :, :, 192:])), 3)
         self.concat5 = lambda x: tf.concat((self.conv5a(x[:, :, :, :192]), self.conv5b(x[:, :, :, 192:])), 3)
@@ -62,6 +62,7 @@ class Alexnet(NN):
         for i in range(len(self.all_layers)):
             x = self.all_layers[i](x)
             if i == self.max_layer_index:
+                print(i)
                 result = self.get_neuron_values(x)
         return result
 
