@@ -132,10 +132,11 @@ def visualization_by_args(args):
 
     # Build the network and loads its weights
     model = get_network(args.nntype)
+    model.set_specified_neuron_values(args.neuron_layer_idx, args.neuron_idx_list)  # specify The neuron to visualize
     model(I)
     weights_loader = AlexNetWeightsLoader()
     weights_loader.load(model, args.ckpt_path + "/")
-    model.set_specified_neuron_values(args.neuron_layer_idx, args.neuron_idx_list)  # specify The neuron to visualize
+
 
     neuron_repre = ' '.join(map(str, args.neuron_idx_list))
 
