@@ -178,7 +178,7 @@ def clip_0_1(image):
 
 def tensor_to_image(tensor):
     tensor = tensor*255
-    tensor = unnormalize_image(np.array(tensor, dtype=np.float32))
+    tensor = np.uint8(unnormalize_image(np.array(tensor, dtype=np.float32)))
     if np.ndim(tensor)>3:
         assert tensor.shape[0] == 1
         tensor = tensor[0]
