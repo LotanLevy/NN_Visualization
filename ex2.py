@@ -98,8 +98,8 @@ def train_main(max_iterations, image_trainer, trained_image, print_freq, max_pre
                                       image_trainer.train_loss.result(), image_trainer.last_pred.result()))
                 loss_plotter.add("loss", i+1, image_trainer.train_loss.result())
                 pred_plotter.add("prediction", i+1, image_trainer.last_pred.result())
-    finally:
         print("Training is stop after {} iterations".format(i))
+    finally:
         loss_plotter.plot()
         pred_plotter.plot()
         return trained_image
