@@ -25,7 +25,7 @@ class ImageTrainer:
         @tf.function()
         def train_step(image):
             with tf.GradientTape() as tape:
-                prediction = self.target_neuron(image)
+                prediction = self.target_neuron.get_relevant_layer()(image)
                 loss = self.calculate_loss(prediction, image)
 
             gradients = tape.gradient(loss, image)
