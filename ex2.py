@@ -133,7 +133,6 @@ def visualization_by_args(args):
     weights_loader = AlexNetWeightsLoader()
     weights_loader.load(model, args.ckpt_path + "/")
 
-
     neuron_repre = ' '.join(map(str, args.neuron_idx_list))
 
     result_title = "result_with_reg_type_{}_for_layer_num_{}_neuron_{}".format(args.reg_type, args.neuron_layer_idx, neuron_repre)
