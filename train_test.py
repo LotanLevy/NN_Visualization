@@ -17,9 +17,6 @@ class ImageTrainer:
         self.last_pred = tf.keras.metrics.Mean(name='last_pred')
         self.loss_name = loss_name
 
-
-
-
     def get_step(self):
 
         @tf.function()
@@ -38,7 +35,8 @@ class ImageTrainer:
         if self.loss_name == "Fourier":
             fft_image = tf.signal.fft(tf.cast(image, tf.complex64))
             w = tf.cast(tf.linalg.norm(fft_image), tf.float32)
-            reg = tf.cast(tf.reduce_mean(tf.abs(image) - 1/w), tf.float32)
+            reg = self.regression_factor * (tf.cast(tf.reduce_mean(tf.abs(fft_image) - 1/w),
+                                                    tf.float32))
         else:
             reg = self.regression_factor * tf.reduce_mean(tf.square(tf.sqrt(tf.square(image))))
         loss = -(prediction - reg)

@@ -83,8 +83,6 @@ def train_main(max_iterations, image_trainer, trained_image, print_freq, max_pre
     loss_plotter = Plotter(["loss"], plot_title + "[loss]", plot_path)
     pred_plotter = Plotter(["prediction"], plot_title + "[prediction]", plot_path)
 
-
-
     train_step = image_trainer.get_step()
     i = 0
     for _ in range(max_iterations):
@@ -106,8 +104,6 @@ def train_main(max_iterations, image_trainer, trained_image, print_freq, max_pre
     return trained_image
 
 
-
-
 def basic_visualization(args):
     args.reg_type = "Basic"
     visualization_by_args(args)
@@ -117,7 +113,6 @@ def fourier_visualization(args):
 
     args.reg_type = "Fourier"
     visualization_by_args(args)
-
 
 
 def visualization_by_args(args):
@@ -155,8 +150,6 @@ def visualization_by_args(args):
 
     # convert network output into image and save the results
     learned_image = tensor_to_image(learned_image)
-
-
 
     im.save(os.path.join(output_path, "reg_type_{}_orig_for_layer_num_{}_neuron_{}.png".format(args.reg_type, args.neuron_layer_idx, neuron_repre)))
     learned_image.save(os.path.join(output_path, "{}.png".format(result_title)))
