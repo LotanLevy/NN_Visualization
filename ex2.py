@@ -148,7 +148,8 @@ def visualization_by_args(args):
     learned_image = train_main(args.max_iter, trainer, I, args.print_freq, args.max_pred_value, result_title, output_path)
 
     # convert network output into image and save the results
-    learned_image = tensor_to_image(learned_image)
+    scale_factor = 255 if args.neuron_layer_idx == (len(model.all_layers) - 1) else 1
+    learned_image = tensor_to_image(learned_image, scale_factor)
 
     im.save(os.path.join(output_path, "reg_type_{}_orig_for_layer_num_{}_neuron_{}.png".format(args.reg_type, args.neuron_layer_idx, neuron_repre)))
     learned_image.save(os.path.join(output_path, "{}.png".format(result_title)))

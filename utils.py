@@ -176,8 +176,8 @@ def unnormalize_image(image):
 #     return tf.clip_by_value(image, clip_value_min=0.0, clip_value_max=1.0)
 
 
-def tensor_to_image(tensor):
-    tensor = tf.clip_by_value(tensor*255, clip_value_min=0.0, clip_value_max=255.0)
+def tensor_to_image(tensor, scale_factor=1):
+    tensor = tf.clip_by_value(tensor*scale_factor, clip_value_min=0.0, clip_value_max=255.0)
     tensor = unnormalize_image(np.array(tensor, dtype=np.float32))
     if np.ndim(tensor)>3:
         assert tensor.shape[0] == 1
