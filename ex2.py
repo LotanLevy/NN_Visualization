@@ -43,7 +43,7 @@ def get_args():
 
 
     parser.add_argument('--ckpt_path', default="weights", help='The type of the network')
-    parser.add_argument('--image_path', default="", help='The path to keep the learned image')
+    parser.add_argument('--image_path', default=None, help='The path to keep the learned image')
     parser.add_argument('--max_iter', type=int, default=100, help='The maximum iterations')
     parser.add_argument('--print_freq', '-pf', type=int, default=500, help='The printing frequency')
     parser.add_argument('--max_pred_value', '-pv', type=float, default=0.95, help='Max prediction value')
@@ -123,7 +123,11 @@ def visualization_by_args(args):
     optimizer = get_optimizer(args.optimizer)
 
     # Loading the image and pre-processing it
-    im = create_random_image()
+    if args.image_path is None:
+        im = create_random_image()
+    else:
+        im = Image.open(args.orig_image_path)
+
     I = preprocess_image(im, args.crop_size)
 
     # Build the network and loads its weights
