@@ -33,11 +33,11 @@ class ImageTrainer:
 
     def calculate_loss(self, prediction, image):
         reg1 = tf.reduce_mean(tf.square(tf.sqrt(tf.square(image))))
-        loss = -prediction + self.regression_factor * reg1
+        loss = -prediction + 0.0001*self.regression_factor * reg1
         if self.loss_name == "Fourier":
             fft_image = tf.signal.fft(tf.cast(image, tf.complex64))
             # w = tf.cast(tf.linalg.norm(fft_image), tf.float32)
-            loss += (tf.cast(tf.reduce_mean(tf.abs(1/fft_image)), tf.float32))
+            loss += (tf.cast(tf.reduce_mean(tf.abs(fft_image)), tf.float32))
 
         self.last_pred.reset_states()
         self.last_pred(prediction)
