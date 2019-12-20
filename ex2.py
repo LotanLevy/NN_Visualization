@@ -123,7 +123,7 @@ def visualization_by_args(args):
     optimizer = get_optimizer(args.optimizer)
 
     # Loading the image and pre-processing it
-    if args.image_path is not None:
+    if args.orig_image_path is None:
         im = create_random_image()
     else:
         im = Image.open(args.orig_image_path)
