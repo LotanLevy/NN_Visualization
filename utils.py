@@ -160,7 +160,9 @@ def preprocess_image(im, crop_size=224):
     return I
 
 def create_random_image(size=(224, 224, 3)):
-    return Image.fromarray(np.uint8(np.abs(np.random.normal(size=size))*255))
+    return Image.fromarray(np.uint8(np.abs(np.random.normal(loc=128, std=128, size=size))*255))
+
+    # return Image.fromarray(np.uint8(np.abs(np.random.normal(size=size))*255))
 
 def add_random_noise(image):
     noise = np.random.normal(image.shape())
@@ -169,7 +171,7 @@ def add_random_noise(image):
 
 def unnormalize_image(image):
     image += [[[104.00698793, 116.66876762, 122.67891434]]]
-    return np.uint8(np.flip(image, 2))
+    return np.uint8( tf.clip_by_value(np.flip(image, 2), clip_value_min=0.0, clip_value_max=255.0))
 
 #
 # def clip_0_1(image):
@@ -177,7 +179,7 @@ def unnormalize_image(image):
 
 
 def tensor_to_image(tensor, scale_factor=1):
-    tensor = tf.clip_by_value(tensor*scale_factor, clip_value_min=0.0, clip_value_max=255.0)
+    tensor = tensor*scale_factor
     tensor = unnormalize_image(np.array(tensor, dtype=np.float32)[0])
     if np.ndim(tensor)>3:
         assert tensor.shape[0] == 1
