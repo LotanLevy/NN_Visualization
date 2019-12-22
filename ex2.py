@@ -97,6 +97,7 @@ def train_main(max_iterations, image_trainer, trained_image, print_freq, max_pre
             loss_plotter.add("loss", i+1, image_trainer.train_loss.result())
             pred_plotter.add("prediction", i+1, image_trainer.last_pred.result())
     print("Training is stop after {} iterations".format(i))
+    print(trained_image)
 
     loss_plotter.plot()
     pred_plotter.plot()
@@ -127,9 +128,8 @@ def visualization_by_args(args):
     else:
         im = Image.open(args.orig_image_path)
 
-    im.show()
-
     I = preprocess_image(im, args.crop_size)
+
 
     # Build the network and loads its weights
     model = get_network(args.nntype)

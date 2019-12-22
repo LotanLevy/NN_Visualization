@@ -160,8 +160,6 @@ def preprocess_image(im, crop_size=224):
     return I
 
 def create_random_image(size=(224, 224, 3)):
-    # return Image.fromarray(np.uint8(np.clip(np.random.normal(loc=128, scale=128, size=size), a_min=0, a_max=255)))
-
     return Image.fromarray(np.uint8(np.abs(np.random.normal(size=size))*255))
 
 def add_random_noise(image):
