@@ -74,7 +74,7 @@ def get_optimizer(optimizer_type):
     :return: optimizer object
     """
     if optimizer_type == "adam":
-        return tf.keras.optimizers.Adam(learning_rate=1e-2)
+        return tf.keras.optimizers.Adam()
     return None
 
 
@@ -126,6 +126,8 @@ def visualization_by_args(args):
         im = create_random_image()
     else:
         im = Image.open(args.orig_image_path)
+
+    im.show()
 
     I = preprocess_image(im, args.crop_size)
 
