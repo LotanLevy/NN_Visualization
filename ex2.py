@@ -132,7 +132,7 @@ def visualization_by_args(args):
     # Build the network and loads its weights
     model = get_network(args.nntype)
     model.set_specified_neuron_values(args.neuron_layer_idx, args.neuron_idx_list)  # specify The neuron to visualize
-    model(I)
+    model(I)# Init graph
     weights_loader = AlexNetWeightsLoader()
     weights_loader.load(model, args.ckpt_path + "/")
 
@@ -148,14 +148,30 @@ def visualization_by_args(args):
         os.mkdir(output_path)
 
     # The Training process
-    learned_image = train_main(args.max_iter, trainer, I, args.print_freq, args.max_pred_value, result_title, output_path)
+    learned_result = train_main(args.max_iter, trainer, I, args.print_freq, args.max_pred_value, result_title, output_path)
 
     # convert network output into image and save the results
     scale_factor = 255 if args.neuron_layer_idx == (len(model.all_layers) - 1) else 1
-    learned_image = tensor_to_image(learned_image, scale_factor)
+    learned_image = tensor_to_image(learned_result, scale_factor)
 
     im.save(os.path.join(output_path, "reg_type_{}_orig_for_layer_num_{}_neuron_{}.png".format(args.reg_type, args.neuron_layer_idx, neuron_repre)))
     learned_image.save(os.path.join(output_path, "{}.png".format(result_title)))
+
+
+    pred_model = get_network(args.nntype)
+    pred_model(I)# Init graph
+    weights_loader.load(pred_model, args.ckpt_path + "/")
+
+    result_c = tf.cast(model(learned_result), tf.float32).numpy()
+    orig_c = tf.cast(model(I), tf.float32).numpy()
+
+    result_ind = np.argmax(result_c)
+    orig_ind = np.argmax(orig_c)
+
+    print("result: %d, %s" % (result_ind, classes[result_ind]))
+    print("orig: %d, %s" % (orig_ind, classes[orig_ind]))
+
+
     print("End process")
 
 
