@@ -155,7 +155,7 @@ def preprocess_image(im, crop_size=224):
     I = I[:, :, :3]
 
     I = np.flip(I, 2)  # BGR
-    I = I - [[[104.00698793, 116.66876762, 122.67891434]]]  # subtract mean - whitening
+    # I = I - [[[104.00698793, 116.66876762, 122.67891434]]]  # subtract mean - whitening
     I = np.reshape(I, (1,) + I.shape).astype(np.float32)
     return I
 
@@ -168,7 +168,7 @@ def add_random_noise(image):
     return result
 
 def unnormalize_image(image):
-    image += [[[104.00698793, 116.66876762, 122.67891434]]]
+    # image += [[[104.00698793, 116.66876762, 122.67891434]]]
     return np.uint8(np.flip(image, 2))
 
 #
@@ -178,7 +178,7 @@ def unnormalize_image(image):
 
 def tensor_to_image(tensor, scale_factor=1):
     tensor = tf.clip_by_value(tensor*scale_factor, clip_value_min=0.0, clip_value_max=255.0)
-    tensor = unnormalize_image(np.array(tensor, dtype=np.float32))
+    tensor = unnormalize_image(np.array(tensor, dtype=np.float32)[0])
     if np.ndim(tensor)>3:
         assert tensor.shape[0] == 1
         tensor = tensor[0]
