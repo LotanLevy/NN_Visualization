@@ -183,6 +183,7 @@ def visualization_by_args(args):
 
 def cls_heat_map(args):
     im = Image.open(args.orig_image_path)
+    im.show()
     I = preprocess_image(im, args.crop_size)
     model = get_network(args.nntype)
     model(I)  # Init graph
@@ -193,7 +194,9 @@ def cls_heat_map(args):
     if not os.path.exists(output_path):
         os.mkdir(output_path)
 
-    pred = tf.cast(model(I), tf.float32).numpy()
+    result = model(I)
+
+    pred = tf.cast(result, tf.float32).numpy()
     best_cls = np.argmax(pred)
 
     dim = int((I.shape[1] - args.kernel_size)/args.stride)
@@ -219,6 +222,9 @@ def cls_heat_map(args):
 
     plt.figure()
     ax = sns.heatmap(h_m, vmin=0, vmax=1)
+    title = "Q4_class_{}_with_kernel_{}_and_stride_{}".format(classes[best_cls], args.kernel_size, args.stride)
+    plt.title(title)
+    plt.savefig(os.path.join(output_path, title + ".png"))
     plt.show()
 
 
