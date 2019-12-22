@@ -5,6 +5,7 @@ import tensorflow as tf
 import numpy as np
 from PIL import ImageFilter
 from classes import classes
+import seaborn as sns; sns.set()
 
 from utils import *
 from train_test import ImageTrainer
@@ -35,25 +36,30 @@ def get_args():
     :return: The configuration values in an argparse object
     """
     parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('--question', '-q', type=int, default=1, help='question number')
+
     parser.add_argument('--nntype', default="Alexnet", help='The type of the network')
-    parser.add_argument('--optimizer', '-opt', default="adam", help='optimizer  type')
     parser.add_argument('--orig_image_path', help='The path of image to read')
-    parser.add_argument('--crop_size', type=int, default=224, help='The crop size of the image')
-
-
-
-    parser.add_argument('--ckpt_path', default="weights", help='The type of the network')
     parser.add_argument('--image_path', default=None, help='The path to keep the learned image')
+
+    parser.add_argument('--crop_size', type=int, default=224, help='The crop size of the image')
+    parser.add_argument('--ckpt_path', default="weights", help='The type of the network')
+
+    # q1-q3
+    parser.add_argument('--optimizer', '-opt', default="adam", help='optimizer  type')
     parser.add_argument('--max_iter', type=int, default=100, help='The maximum iterations')
     parser.add_argument('--print_freq', '-pf', type=int, default=500, help='The printing frequency')
     parser.add_argument('--max_pred_value', '-pv', type=float, default=0.95, help='Max prediction value')
-
-
-
     parser.add_argument('--reg_factor', type=float, default=0.2, help='The regression (lambda) value')
     parser.add_argument('--reg_type', default="Basic", help='The regression type (Fourier/basic)')
     parser.add_argument('--neuron_layer_idx', "-nl", type=int, default=21, help='The index of the require neuron')
     parser.add_argument('-ni', '--neuron_idx_list', type=int, default=[], action='append', help='The indices of the neuron (-ni=1, -ni=2 -ni=3)')
+
+    # q4
+    parser.add_argument('--stride', '-s', type=int, default=2, help='The stride of the zeros block')
+    parser.add_argument('--kernel_size', '-ks', type=int, default=2, help='The stride of the zeros block')
+
+
     return parser.parse_args()
 
 
@@ -175,40 +181,62 @@ def visualization_by_args(args):
     print("End process")
 
 
-
-def fool_network(args):
+def cls_heat_map(args):
     im = Image.open(args.orig_image_path)
-    blur_image = im.filter(ImageFilter.GaussianBlur(3))
-    sharp_image = im.filter(ImageFilter.UnsharpMask(1))
-    to_identify = {"orig": im, "blurred": blur_image, "sharp": sharp_image}
-    for image_name in to_identify:
+    I = preprocess_image(im, args.crop_size)
+    model = get_network(args.nntype)
+    model(I)  # Init graph
+    weights_loader = AlexNetWeightsLoader()
+    weights_loader.load(model, args.ckpt_path + "/")
+
+    output_path = os.path.join(args.image_path, "learned_images")
+    if not os.path.exists(output_path):
+        os.mkdir(output_path)
+
+    pred = tf.cast(model(I), tf.float32).numpy()
+    best_cls = np.argmax(pred)
+
+    dim = int((I.shape[1] - args.kernel_size)/args.stride)
+
+    h_m = np.zeros((dim, dim))
+    i,j=0,0
+    r,c = int(np.floor(args.kernel_size/2)), int(np.floor(args.kernel_size/2))
+    while r < I.shape[1] - int(np.ceil(args.kernel_size/2)) :
+        while c < I.shape[2] - int(np.ceil(args.kernel_size/2)):
+            image = I.copy()
+            image[0, r - int(np.floor(args.kernel_size/2)): r + int(np.ceil(args.kernel_size/2)), c - int(np.floor(args.kernel_size/2)): c + int(np.ceil(args.kernel_size/2)), :] = 0
+
+            cls_score = tf.cast(model(image), tf.float32).numpy()[0, best_cls]
+            h_m[i,j] = cls_score
+            c += args.stride
+            j+=1
+        r += args.stride
+        i+=1
+        j=0
+        c = int(np.floor(args.kernel_size/2))
+
+    print(h_m)
+
+    plt.figure()
+    ax = sns.heatmap(h_m, vmin=0, vmax=1)
+    plt.show()
 
 
-        I = preprocess_image(to_identify[image_name])
 
 
-        # Build the network and loads its weights
-        model = get_network(args.nntype)
-        model(I)
-        weights_loader = AlexNetWeightsLoader()
-        weights_loader.load(model, args.ckpt_path + "/")
 
-        c = model(I)
 
-        c = tf.cast(c, tf.float32).numpy()
 
-        score = np.max(c)
-        top_ind = np.argmax(c)
-        title = "{}: {}, {} with score {}".format(image_name, top_ind, classes[top_ind], score)
-        print(title)
-        to_identify[image_name].save(title + ".png")
+
+
 
 
 
 if __name__ == '__main__':
     args = get_args()
-    # fool_network(args)
-    visualization_by_args(args)
-    # basic_visualization(args)
-    # fourier_visualization(args)
+    if args.question < 4:
+        visualization_by_args(args)
+    else:
+        cls_heat_map(args)
+
 
