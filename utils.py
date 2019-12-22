@@ -155,7 +155,7 @@ def preprocess_image(im, crop_size=224):
     I = I[:, :, :3]
 
     I = np.flip(I, 2)  # BGR
-    # I = I - [[[104.00698793, 116.66876762, 122.67891434]]]  # subtract mean - whitening
+    I = I - [[[104.00698793, 116.66876762, 122.67891434]]]  # subtract mean - whitening
     I = np.reshape(I, (1,) + I.shape).astype(np.float32)
     return I
 
@@ -168,7 +168,7 @@ def add_random_noise(image):
     return result
 
 def unnormalize_image(image):
-    # image += [[[104.00698793, 116.66876762, 122.67891434]]]
+    image += [[[104.00698793, 116.66876762, 122.67891434]]]
     return np.uint8(np.flip(image, 2))
 
 #
