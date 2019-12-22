@@ -148,7 +148,7 @@ def visualization_by_args(args):
         os.mkdir(output_path)
 
     # The Training process
-    learned_result = train_main(args.max_iter, trainer, I, args.print_freq, args.max_pred_value, result_title, output_path)
+    learned_result = train_main(args.max_iter, trainer,np.copy(I), args.print_freq, args.max_pred_value, result_title, output_path)
 
     # convert network output into image and save the results
     scale_factor = 255 if args.neuron_layer_idx == (len(model.all_layers) - 1) else 1
@@ -162,8 +162,8 @@ def visualization_by_args(args):
     pred_model(I)# Init graph
     weights_loader.load(pred_model, args.ckpt_path + "/")
 
-    result_c = tf.cast(model(learned_result), tf.float32).numpy()
-    orig_c = tf.cast(model(I), tf.float32).numpy()
+    result_c = tf.cast(pred_model(learned_result), tf.float32).numpy()
+    orig_c = tf.cast(pred_model(I), tf.float32).numpy()
 
     result_ind = np.argmax(result_c)
     orig_ind = np.argmax(orig_c)
