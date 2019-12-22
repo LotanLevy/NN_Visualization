@@ -168,8 +168,8 @@ def visualization_by_args(args):
     result_ind = np.argmax(result_c)
     orig_ind = np.argmax(orig_c)
 
-    print("result: %d, %s" % (result_ind, classes[result_ind]))
-    print("orig: %d, %s" % (orig_ind, classes[orig_ind]))
+    print("result: %d, %s, score %f" % (result_ind, classes[result_ind], np.max(result_c)))
+    print("orig: %d, %s, score %f" % (orig_ind, classes[orig_ind], np.max(orig_c)))
 
 
     print("End process")
