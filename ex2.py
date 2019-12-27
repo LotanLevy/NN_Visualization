@@ -208,9 +208,7 @@ def cls_heat_map(args):
         while c < I.shape[2] - int(np.ceil(args.kernel_size/2)):
             image = I.copy()
             image[0, r - int(np.floor(args.kernel_size/2)): r + int(np.ceil(args.kernel_size/2)), c - int(np.floor(args.kernel_size/2)): c + int(np.ceil(args.kernel_size/2)), :] = 0
-            # plt.figure()
-            # plt.imshow(image[0])
-            # plt.show()
+
             cls_score = tf.cast(model(image), tf.float32).numpy()[0, best_cls]
             h_m[i,j] = cls_score
             c += args.stride
