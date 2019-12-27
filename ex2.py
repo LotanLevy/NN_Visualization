@@ -80,7 +80,7 @@ def get_optimizer(optimizer_type):
     :return: optimizer object
     """
     if optimizer_type == "adam":
-        return tf.keras.optimizers.Adam(1e-2)
+        return tf.keras.optimizers.Adam(0.15)
     return None
 
 
