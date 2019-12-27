@@ -46,7 +46,7 @@ class ImageTrainer:
             # print("tf.abs(fft_image)-(1/w)")
             # tf.print(tf.abs(fft_image)-(1/w))
 
-            loss += (tf.cast(tf.reduce_sum(tf.square(tf.abs(fft_image)-(1/w))), tf.float32))
+            loss += self.regression_factor * (tf.cast(tf.reduce_sum(tf.square(tf.abs(fft_image)-(1/w))), tf.float32))
         else:
             reg1 = tf.reduce_mean(tf.square(tf.sqrt(tf.square(image))))
             loss += self.regression_factor * reg1
