@@ -36,6 +36,10 @@ class ImageTrainer:
         if self.loss_name == "Fourier":
             fft_image = tf.signal.fft(tf.cast(image, tf.complex64))
             w = tf.cast(tf.linalg.norm(fft_image), tf.float32)
+
+            print(w)
+
+
             loss += (tf.cast(tf.reduce_sum(tf.square(tf.abs(fft_image)-(1/w))), tf.float32))
         else:
             reg1 = tf.reduce_mean(tf.square(tf.sqrt(tf.square(image))))
