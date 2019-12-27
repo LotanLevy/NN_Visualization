@@ -40,6 +40,8 @@ class ImageTrainer:
             print("-----------------")
             tf.print(w)
             tf.print(tf.abs(fft_image))
+            tf.print((1 / w))
+            tf.print(tf.abs(fft_image)-(1/w))
 
 
             loss += (tf.cast(tf.reduce_sum(tf.square(tf.abs(fft_image)-(1/w))), tf.float32))
