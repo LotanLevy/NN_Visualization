@@ -35,13 +35,13 @@ class ImageTrainer:
         loss = -prediction
         if self.loss_name == "Fourier":
             fft_image = tf.signal.fft(tf.cast(image, tf.complex64))
-            tf.print(fft_image.shape)
+            tf.print(fft_image[0].shape)
 
             w = tf.cast(tf.linalg.norm(fft_image[0]), tf.float32)
 
             print("-----------------")
             tf.print(w)
-            tf.print(tf.abs(fft_image))
+            tf.print(tf.abs(fft_image[0]))
             print("1 / w")
             tf.print((1 / w))
             print("tf.abs(fft_image)-(1/w)")
