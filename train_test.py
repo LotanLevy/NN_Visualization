@@ -35,7 +35,9 @@ class ImageTrainer:
         loss = -prediction
         if self.loss_name == "Fourier":
             fft_image = tf.signal.fft(tf.cast(image, tf.complex64))
-            w = tf.cast(tf.linalg.normalize(fft_image, axis=[-3,-2,-1]), tf.float32)
+            tf.print(fft_image.shape)
+
+            w = tf.cast(tf.linalg.normalize(fft_image, axis=[-2,-1]), tf.float32)
 
             print("-----------------")
             tf.print(w)
