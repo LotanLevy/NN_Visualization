@@ -40,7 +40,9 @@ class ImageTrainer:
             print("-----------------")
             tf.print(w)
             tf.print(tf.abs(fft_image))
+            print("1 / w")
             tf.print((1 / w))
+            print("tf.abs(fft_image)-(1/w)")
             tf.print(tf.abs(fft_image)-(1/w))
 
 
