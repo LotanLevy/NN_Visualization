@@ -36,7 +36,7 @@ class ImageTrainer:
         if self.loss_name == "Fourier":
             fft_image = tf.signal.fft(tf.cast(image, tf.complex64))
 
-            w = tf.cast(tf.norm(fft_image[0], ord='euclidean', axis=2, keepdims=True), tf.float32)
+            w = tf.cast(tf.norm(fft_image, ord='euclidean', axis=0, keepdims=True), tf.float32)
             tf.print(w.shape)
             print("-----------------")
             tf.print(w)
