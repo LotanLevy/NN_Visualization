@@ -37,7 +37,7 @@ class ImageTrainer:
             fft_image = tf.signal.fft(tf.cast(image, tf.complex64))
             tf.print(fft_image[0].shape)
 
-            w = tf.cast(tf.linalg.norm(fft_image[0]), tf.float32)
+            w = tf.cast(tf.linalg.normalize(fft_image[0], axis=[-2, -1]), tf.float32)
 
             print("-----------------")
             tf.print(w)
